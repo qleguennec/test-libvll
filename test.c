@@ -6,7 +6,7 @@
 /*   By: qle-guen <qle-guen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/27 17:27:50 by qle-guen          #+#    #+#             */
-/*   Updated: 2016/11/28 13:35:57 by qle-guen         ###   ########.fr       */
+/*   Updated: 2016/11/28 18:00:21 by qle-guen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#define IMPORT(s) 		strcpy(a, s); b = a; l = vll_import(&b, "[],'", 0);
+#define IMPORT(s) 		strcpy(a, s); l = vll_import(s, "[],'", 0);
 #define EXPORT(l, v)	vll_export(l, &v, VLL_DEF_DELIM, VLL_EXPORT_DELIM | VLL_EXPORT_STR);
 #define PRINT(l)		printf("%lu\t", l->size); fflush(stdout); vll_print(1, l, VLL_PRINT_NL);
 #define TEST_START(s)	vect_init(&v); ok = 0; tests = 0; printf("\ntest_%s\n", s);
@@ -27,7 +27,7 @@
 	if (!strcmp(v.data, s)) \
 		{ok++; vll_free(l);} \
 	else \
-		{printf("fail on %s\n", s); PRINT(l); l1 = vll_fmap(l, &_vllsize); PRINT(l1);} \
+		{printf("fail on %s\n", s); PRINT(l); l1 = vll_fmap(l, &_vllsize, NULL); PRINT(l1);} \
 	v.used = 0;
 
 #define TEST_SIZE(s, k) tests++; \
@@ -35,14 +35,15 @@
 	if (l->size == k) \
 		{ok++; vll_free(l);} \
 	else \
-		{printf("fail on %s\n", s); PRINT(l); l1 = vll_fmap(l, &_vllsize); PRINT(l1);} \
+		{printf("fail on %s\n", s); PRINT(l); l1 = vll_fmap(l, &_vllsize, NULL); PRINT(l1);} \
 
-t_vll		*_vllsize(t_vll *l)
+t_vll		*_vllsize(t_vll *l, void *p)
 {
 	t_vll	*new;
 	t_vect	*v;
 	size_t	size;
 
+	(void)p;
 	new = vll_new();
 	size = vll_size(l);
 	v = vect_new(NULL, 0);
@@ -57,7 +58,6 @@ void		test_imp_exp(void)
 	t_vll	*l1;
 	t_vect	v;
 	char	a[1024];
-	char	*b;
 	int		ok;
 	int		tests;
 
@@ -79,7 +79,6 @@ void		test_size(void)
 	t_vll	*l1;
 	t_vect	v;
 	char	a[1024];
-	char	*b;
 	int		ok;
 	int		tests;
 
@@ -97,4 +96,9 @@ int			main(void)
 {
 	test_imp_exp();
 	test_size();
+
+	t_vll *l, *l1;
+	l = vll_import("['  a  b', 'c   d', '  e f']", "[],'", 0);
+	l1 = vll_split(l, " ", 1);
+	PRINT(l1);
 }
